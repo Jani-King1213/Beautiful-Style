@@ -1,268 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Eid Hacker Prank Ultra Pro</title>
+  <meta charset="UTF-8">
+  <title>Eid Surprise Pro</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to top, #020111, #191621);
+      color: white;
+    }
 
-<style>
-body{
-margin:0;
-background:black;
-font-family:monospace;
-overflow:hidden;
-}
+    .stars {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/stardust.png');
+      animation: moveStars 50s linear infinite;
+    }
 
-#eid{
-position:fixed;
-top:25%;
-left:50%;
-transform:translate(-50%,-50%);
-font-size:60px;
-color:#ff9900;
-font-weight:bold;
-text-align:center;
-}
+    @keyframes moveStars {
+      from {background-position: 0 0;}
+      to {background-position: 1000px 1000px;}
+    }
 
-#options{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-display:none;
-flex-direction:column;
-gap:20px;
-align-items:center;
-}
+    .moon {
+      position: absolute;
+      top: 50px;
+      right: 80px;
+      width: 80px;
+      height: 80px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 30px #fff;
+      animation: float 4s ease-in-out infinite;
+    }
 
-.optionBtn{
-padding:15px 30px;
-font-size:20px;
-border:none;
-border-radius:12px;
-background:#ff9900;
-color:white;
-cursor:pointer;
-}
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
 
-#prankScreen{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:linear-gradient(#000,#111);
-color:#39ff14;
-display:none;
-flex-direction:column;
-padding:20px;
-font-size:20px;
-overflow-y:auto;
-}
+    .card {
+      position: relative;
+      background: rgba(255,255,255,0.1);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+      z-index: 2;
+    }
 
-.flicker{
-animation:flicker 0.2s infinite;
-}
+    #message {
+      font-size: 24px;
+      min-height: 60px;
+      transition: 0.5s;
+    }
 
-@keyframes flicker{
-0%{opacity:1}
-50%{opacity:0.6}
-100%{opacity:1}
-}
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: red;
+      color: white;
+      cursor: pointer;
+      display: none;
+      animation: blink 1s infinite;
+    }
 
-#flash{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:white;
-opacity:0;
-pointer-events:none;
-}
-</style>
+    @keyframes blink {
+      0% { background: red; }
+      50% { background: yellow; color: black; }
+      100% { background: red; }
+    }
+
+    .firework {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background: white;
+      border-radius: 50%;
+      animation: explode 1s ease-out forwards;
+    }
+
+    @keyframes explode {
+      to {
+        transform: translate(var(--x), var(--y));
+        opacity: 0;
+      }
+    }
+
+    .glow {
+      font-size: 28px;
+      color: gold;
+      text-shadow: 0 0 10px gold, 0 0 20px orange;
+      animation: glow 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px gold; }
+      to { text-shadow: 0 0 20px orange, 0 0 30px gold; }
+    }
+  </style>
 </head>
-
 <body>
 
-<div id="eid">Let's Start</div>
+<div class="stars"></div>
+<div class="moon"></div>
 
-<div id="options">
-
-<div>
-Select connection<br>
-<button class="optionBtn" data-connection="WiFi">WiFi</button>
-<button class="optionBtn" data-connection="Mobile Data">Mobile Data</button>
+<div class="card">
+  <div id="message">Let's Start</div>
+  <button id="btn" onclick="showFinal()">⚠ Click to Continue</button>
 </div>
 
-<div>
-Select device<br>
-<button class="optionBtn" data-device="iPhone">iPhone</button>
-<button class="optionBtn" data-device="Android">Android</button>
-<button class="optionBtn" data-device="System">System</button>
-</div>
+<!-- Alarm Sound -->
+<audio id="alarmSound">
+  <source src="https://www.soundjay.com/button/beep-07.wav">
+</audio>
 
-</div>
-
-<div id="prankScreen"></div>
-<div id="flash"></div>
+<!-- Final Celebration Sound -->
+<audio id="celebrationSound">
+  <source src="https://www.soundjay.com/human/cheering-01.mp3">
+</audio>
 
 <script>
-
-function playSound(url){
-let audio = new Audio(url);
-audio.volume = 0.4;
-audio.play();
-}
-
-function beep(){
-playSound("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-}
-
-function shutter(){
-playSound("https://actions.google.com/sounds/v1/camera/camera_shutter.ogg");
-}
-
-function siren(){
-playSound("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-}
-
-function flash(){
-let f=document.getElementById("flash");
-f.style.opacity="1";
-setTimeout(()=>{ f.style.opacity="0"; },150);
-}
-
-function typeLine(container,text,speed=30){
-let line=document.createElement("div");
-line.classList.add("flicker");
-container.appendChild(line);
-
-let i=0;
-
-let t=setInterval(()=>{
-if(i < text.length){
-line.textContent += text[i];
-i++;
-container.scrollTop = container.scrollHeight;
-}else{
-clearInterval(t);
-}
-},speed);
-}
-
-function startPrank(connection,device){
-
-document.getElementById("eid").style.display="none";
-document.getElementById("options").style.display="none";
-
-let screen=document.getElementById("prankScreen");
-screen.style.display="flex";
-
-if(device==="Android" || device==="iPhone"){
-screen.style.fontSize="26px";
-}
-
-let ip=`192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
-
-let lat=(29 + Math.random()).toFixed(4);
-let lon=(71 + Math.random()).toFixed(4);
-
-let messages=[
-`Connection type: ${connection}`,
-`Device detected: ${device}`,
-`Scanning network ports...`,
-`Signal strength ▂▄▆█`,
-`Fetching IP address: ${ip}`,
-`Locating GPS coordinates...`,
-`Latitude: ${lat}`,
-`Longitude: ${lon}`,
-`Location: Bahawalpur, Punjab, Pakistan`,
-`Bypassing firewall security...`,
-`Injecting exploit payload...`,
-`Opening secure socket tunnel...`,
-`Accessing device storage...`,
-`Accessing camera module...`,
-`Camera accessed successfully`,
-`Capturing screenshot...`,
-`Encrypting sensitive files...`,
-`Preparing remote transfer channel...`
+const messages = [
+  "Let's Start",
+  "I hope you are fine 😊",
+  "I have a surprise for you 🎁"
 ];
 
-let delay=0;
+const finalMessage = "🌙✨ Advance Eid Mubarak My Friend 🎉";
 
-messages.forEach(msg=>{
-setTimeout(()=>{
-if(msg.includes("Capturing")){
-shutter();
-flash();
-}else{
-beep();
-}
-typeLine(screen,msg);
-},delay);
-delay+=1100;
-});
+let index = 0;
+const msg = document.getElementById("message");
+const btn = document.getElementById("btn");
+const alarm = document.getElementById("alarmSound");
+const celebration = document.getElementById("celebrationSound");
 
-setTimeout(()=>{
+function showNextMessage() {
+  msg.style.opacity = 0;
 
-let line=document.createElement("div");
-screen.appendChild(line);
+  setTimeout(() => {
+    index++;
 
-let progress=0;
+    if (index < messages.length) {
+      msg.innerText = messages[index];
+      msg.style.opacity = 1;
+    } else {
+      clearInterval(interval);
 
-let loading=setInterval(()=>{
+      msg.innerText = "⚠ Click to Continue";
+      msg.style.opacity = 1;
+      btn.style.display = "inline-block";
 
-progress++;
-
-let filled = Math.floor(progress/5);
-let bar="█".repeat(filled) + " ".repeat(20-filled);
-
-line.textContent=`Data transfer: [${bar}] ${progress}%`;
-
-if(progress>=100){
-clearInterval(loading);
-siren();
-
-setTimeout(()=>{
-
-screen.innerHTML = `
-<h1 style="color:gold; text-align:center;">
-🎉 EID MUBARAK 🎉<br>
-My Love My Honey Marij😘😘😄
-</h1>
-`;
-
-},2000);
-
+      alarm.loop = true;
+      alarm.play();
+    }
+  }, 500);
 }
 
-},120);
+function showFinal() {
+  msg.classList.add("glow");
+  msg.innerText = finalMessage;
+  btn.style.display = "none";
 
-},delay);
+  // Stop alarm
+  alarm.pause();
+  alarm.currentTime = 0;
 
+  // Play celebration sound 🎉
+  celebration.play();
+
+  startFireworks();
 }
 
-function showOptions(){
-document.getElementById("eid").style.display="none";
-document.getElementById("options").style.display="flex";
+function startFireworks() {
+  setInterval(() => {
+    for (let i = 0; i < 20; i++) {
+      const fw = document.createElement("div");
+      fw.className = "firework";
+
+      const x = (Math.random() - 0.5) * 300 + "px";
+      const y = (Math.random() - 0.5) * 300 + "px";
+
+      fw.style.setProperty('--x', x);
+      fw.style.setProperty('--y', y);
+
+      fw.style.left = "50%";
+      fw.style.top = "50%";
+
+      document.body.appendChild(fw);
+
+      setTimeout(() => fw.remove(), 1000);
+    }
+  }, 800);
 }
 
-let connection=null;
-let device=null;
-
-document.querySelectorAll(".optionBtn").forEach(btn=>{
-btn.onclick=()=>{
-if(btn.dataset.connection) connection=btn.dataset.connection;
-if(btn.dataset.device) device=btn.dataset.device;
-
-if(connection && device){
-startPrank(connection,device);
-}
-}
-});
-
-setTimeout(showOptions,3000);
-
+const interval = setInterval(showNextMessage, 2000);
 </script>
 
 </body>
